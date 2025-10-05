@@ -5,6 +5,8 @@ Genera eseguibili standalone per Windows, macOS e Linux
 """
 
 import sys
+import os
+from pathlib import Path
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
 block_cipher = None
@@ -18,6 +20,13 @@ is_linux = sys.platform.startswith('linux')
 exe_name = 'AudioManager'
 if is_windows:
     exe_name = 'AudioManager.exe'
+
+# Verifica esistenza file icona (opzionale)
+icon_file = None
+if is_windows and Path('icon.ico').exists():
+    icon_file = 'icon.ico'
+elif is_macos and Path('icon.icns').exists():
+    icon_file = 'icon.icns'
 
 # Raccolta delle dipendenze e dati
 hidden_imports = [
@@ -83,7 +92,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='icon.ico' if is_windows else 'icon.icns' if is_macos else None,
+    icon=icon_file,  # Usa l'icona solo se esiste
 )
 
 # Per macOS, crea un bundle .app
@@ -91,7 +100,7 @@ if is_macos:
     app = BUNDLE(
         exe,
         name='AudioManager.app',
-        icon='icon.icns',
+        icon=icon_file,  # Usa l'icona solo se esiste
         bundle_identifier='com.platea.audiomanager',
         info_plist={
             'CFBundleName': 'Audio Manager Teatrale',
