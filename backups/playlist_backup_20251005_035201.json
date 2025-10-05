@@ -6,69 +6,76 @@
       "duration": 72.88163265306123,
       "index": 0,
       "notes": "",
-      "color": "#ffffff",
+      "color": "",
       "loop": false,
-      "hotkey": "F1"
+      "hotkey": "F1",
+      "volume": 20
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 2-Un Cadavere .mp3",
       "title": "traccia 2-Un Cadavere ",
-      "duration": 0.0,
+      "duration": 70.74734693877551,
       "index": 1,
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "F2"
+      "hotkey": "F2",
+      "volume": 100
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 3 - Bartolomeo e il rosario.mp3",
       "title": "traccia 3 - Bartolomeo e il rosario",
-      "duration": 0.0,
+      "duration": 59.47331065759637,
       "index": 2,
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "F3"
+      "hotkey": "F3",
+      "volume": 100
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 4- Sangue tanto sangue.mp3",
       "title": "traccia 4- Sangue tanto sangue",
-      "duration": 0.0,
+      "duration": 35.569002267573694,
       "index": 3,
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "F4"
+      "hotkey": "F4",
+      "volume": 100
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 5 - ingresso coscienza.mp3",
       "title": "traccia 5 - ingresso coscienza",
-      "duration": 0.0,
+      "duration": 46.13224489795918,
       "index": 4,
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "F5"
+      "hotkey": "F5",
+      "volume": 100
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 6- Danza rimorsi.mp3",
       "title": "traccia 6- Danza rimorsi",
-      "duration": 0.0,
+      "duration": 228.98938775510203,
       "index": 5,
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "F6"
+      "hotkey": "F6",
+      "volume": 100
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 7 - lo stupro.mp3",
       "title": "traccia 7 - lo stupro",
-      "duration": 0.0,
+      "duration": 83.27836734693878,
       "index": 6,
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "F7"
+      "hotkey": "F7",
+      "volume": 100
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 8 - capolavoro.mp3",
@@ -78,7 +85,8 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "F8"
+      "hotkey": "F8",
+      "volume": 100
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 9 - Giliola e le maschere.mp3",
@@ -88,28 +96,31 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "F9"
+      "hotkey": "F9",
+      "volume": 100
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 10 - suicidio.mp3",
       "title": "traccia 10 - suicidio",
-      "duration": 0.0,
+      "duration": 96.65306122448979,
       "index": 9,
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "F10"
+      "hotkey": "F10",
+      "volume": 100
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 11- sul buio finale .mp3",
       "title": "traccia 11- sul buio finale ",
-      "duration": 0.0,
+      "duration": 103.0149433106576,
       "index": 10,
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "F11"
+      "hotkey": "F11",
+      "volume": 100
     }
   ],
-  "current_index": 8
+  "current_index": 9
 }

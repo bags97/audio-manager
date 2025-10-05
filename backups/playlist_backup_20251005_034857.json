@@ -3,13 +3,13 @@
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 1 - incubo iniziale.mp3",
       "title": "traccia 1 - incubo iniziale",
-      "duration": 0.0,
+      "duration": 72.88163265306123,
       "index": 0,
       "notes": "",
       "color": "",
       "loop": false,
       "hotkey": "F1",
-      "volume": 100
+      "volume": 20
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 2-Un Cadavere .mp3",
@@ -122,5 +122,5 @@
       "volume": 100
     }
   ],
-  "current_index": -1
+  "current_index": 0
 }

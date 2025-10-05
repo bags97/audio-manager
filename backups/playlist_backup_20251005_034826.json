@@ -8,18 +8,18 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "",
-      "volume": 10
+      "hotkey": "F1",
+      "volume": 20
     },
     {
       "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 2-Un Cadavere .mp3",
       "title": "traccia 2-Un Cadavere ",
-      "duration": 70.74734693877551,
+      "duration": 0.0,
       "index": 1,
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "",
+      "hotkey": "F2",
       "volume": 100
     },
     {
@@ -30,7 +30,7 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "",
+      "hotkey": "F3",
       "volume": 100
     },
     {
@@ -41,7 +41,7 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "",
+      "hotkey": "F4",
       "volume": 100
     },
     {
@@ -52,7 +52,7 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "",
+      "hotkey": "F5",
       "volume": 100
     },
     {
@@ -63,7 +63,7 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "",
+      "hotkey": "F6",
       "volume": 100
     },
     {
@@ -74,7 +74,7 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "",
+      "hotkey": "F7",
       "volume": 100
     },
     {
@@ -85,7 +85,7 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "",
+      "hotkey": "F8",
       "volume": 100
     },
     {
@@ -96,7 +96,7 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "",
+      "hotkey": "F9",
       "volume": 100
     },
     {
@@ -107,7 +107,7 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "",
+      "hotkey": "F10",
       "volume": 100
     },
     {
@@ -118,9 +118,9 @@
       "notes": "",
       "color": "",
       "loop": false,
-      "hotkey": "",
+      "hotkey": "F11",
       "volume": 100
     }
   ],
-  "current_index": 1
+  "current_index": 0
 }
