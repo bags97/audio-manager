@@ -1,4 +1,13 @@
+# Audio Manager Teatrale - Requisiti Python
+# Compatibile con Windows, macOS e Linux
+
+# Audio processing
 sounddevice>=0.4.6
 soundfile>=0.12.1
-numpy>=1.24.0
+numpy>=1.24.0,<2.0.0
+
+# Visualization (optional ma raccomandato)
 matplotlib>=3.7.0
+
+# Build tool per creare eseguibili standalone
+pyinstaller>=6.0.0

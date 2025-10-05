@@ -56,3 +56,15 @@ desktop.ini
 # File di test temporanei
 test_*.json
 temp_*
+
+# PyInstaller
+*.spec.bak
+*.manifest
+*.exe.config
+
+# macOS
+*.app
+
+# Linux binari
+AudioManager
+!audio_manager.spec
