@@ -903,10 +903,24 @@ class AudioManagerGUI:
     def _save_last_session(self):
         """Salva la configurazione della sessione corrente"""
         try:
+            # Salva i device ID invece degli indici
+            main_device_id = None
+            preview_device_id = None
+            
+            if hasattr(self, 'main_device_combo') and hasattr(self, 'audio_devices'):
+                idx = self.main_device_combo.current()
+                if idx >= 0 and idx < len(self.audio_devices):
+                    main_device_id = self.audio_devices[idx]['id']
+            
+            if hasattr(self, 'preview_device_combo') and hasattr(self, 'audio_devices'):
+                idx = self.preview_device_combo.current()
+                if idx >= 0 and idx < len(self.audio_devices):
+                    preview_device_id = self.audio_devices[idx]['id']
+            
             config = {
                 'playlist': self.playlist_manager.to_dict()['tracks'],
-                'main_device_index': self.main_device_combo.current() if hasattr(self, 'main_device_combo') else 0,
-                'preview_device_index': self.preview_device_combo.current() if hasattr(self, 'preview_device_combo') else 0,
+                'main_device_id': main_device_id,
+                'preview_device_id': preview_device_id,
                 'main_volume': self.main_volume_var.get() if hasattr(self, 'main_volume_var') else 100,
                 'preview_volume': self.preview_volume_var.get() if hasattr(self, 'preview_volume_var') else 100,
                 'current_track_index': self.playlist_manager.current_index if self.playlist_manager.current_index >= 0 else None
@@ -935,20 +949,29 @@ class AudioManagerGUI:
                 self._update_track_list()
                 self._rebuild_hotkey_map()
             
-            # Ripristina dispositivi audio (se disponibili)
-            if hasattr(self, 'main_device_combo') and 'main_device_index' in config:
-                try:
-                    self.main_device_combo.current(config['main_device_index'])
-                    self._on_main_device_changed()
-                except:
-                    pass
-            
-            if hasattr(self, 'preview_device_combo') and 'preview_device_index' in config:
-                try:
-                    self.preview_device_combo.current(config['preview_device_index'])
-                    self._on_preview_device_changed()
-                except:
-                    pass
+            # Ripristina dispositivi audio cercando per device ID
+            if hasattr(self, 'audio_devices'):
+                # Ripristina main device
+                if 'main_device_id' in config and config['main_device_id'] is not None:
+                    for idx, device in enumerate(self.audio_devices):
+                        if device['id'] == config['main_device_id']:
+                            try:
+                                self.main_device_combo.current(idx)
+                                self._on_main_device_changed()
+                            except:
+                                pass
+                            break
+                
+                # Ripristina preview device
+                if 'preview_device_id' in config and config['preview_device_id'] is not None:
+                    for idx, device in enumerate(self.audio_devices):
+                        if device['id'] == config['preview_device_id']:
+                            try:
+                                self.preview_device_combo.current(idx)
+                                self._on_preview_device_changed()
+                            except:
+                                pass
+                            break
             
             # Ripristina volumi
             if hasattr(self, 'main_volume_var') and 'main_volume' in config:
@@ -973,7 +996,8 @@ class AudioManagerGUI:
     def _on_closing(self):
         """Gestisce la chiusura dell'applicazione"""
         # Salva la sessione corrente
-        self._save_last_session()
+        if self._save_last_session():
+            print("✓ Sessione salvata con successo (playlist + dispositivi audio)")
         
         # Crea backup finale
         self.auto_backup.create_backup()
