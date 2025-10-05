@@ -260,23 +260,25 @@ class AudioManagerGUI:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
         # Treeview per le tracce
-        self.track_tree = ttk.Treeview(list_frame, columns=('index', 'title', 'duration', 'loop', 'hotkey', 'volume', 'notes'),
+        self.track_tree = ttk.Treeview(list_frame, columns=('index', 'title', 'duration', 'trim', 'loop', 'hotkey', 'volume', 'notes'),
                                         show='headings', yscrollcommand=scrollbar.set)
         self.track_tree.heading('index', text='#')
         self.track_tree.heading('title', text='Titolo')
         self.track_tree.heading('duration', text='Durata')
+        self.track_tree.heading('trim', text='Trim')
         self.track_tree.heading('loop', text='Loop')
         self.track_tree.heading('hotkey', text='Key')
         self.track_tree.heading('volume', text='Vol%')
         self.track_tree.heading('notes', text='Note')
         
         self.track_tree.column('index', width=40, anchor=tk.CENTER)
-        self.track_tree.column('title', width=250)
-        self.track_tree.column('duration', width=80, anchor=tk.CENTER)
+        self.track_tree.column('title', width=230)
+        self.track_tree.column('duration', width=70, anchor=tk.CENTER)
+        self.track_tree.column('trim', width=90, anchor=tk.CENTER)
         self.track_tree.column('loop', width=50, anchor=tk.CENTER)
         self.track_tree.column('hotkey', width=50, anchor=tk.CENTER)
         self.track_tree.column('volume', width=50, anchor=tk.CENTER)
-        self.track_tree.column('notes', width=150)
+        self.track_tree.column('notes', width=120)
         
         self.track_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.config(command=self.track_tree.yview)
@@ -830,6 +832,15 @@ class AudioManagerGUI:
         # Aggiungi le tracce
         for track in self.playlist_manager.tracks:
             duration_str = self._format_time(track.duration) if track.duration > 0 else "--:--"
+            
+            # Formatta trim
+            if track.start_time > 0 or track.end_time > 0:
+                start_str = self._format_time(track.start_time)
+                end_str = self._format_time(track.end_time) if track.end_time > 0 else "fine"
+                trim_str = f"{start_str}-{end_str}"
+            else:
+                trim_str = ""
+            
             loop_str = "🔁" if track.loop else ""
             hotkey_str = track.hotkey or ""
             volume_str = f"{track.volume}%"
@@ -839,6 +850,7 @@ class AudioManagerGUI:
                 track.index + 1,
                 track.title,
                 duration_str,
+                trim_str,
                 loop_str,
                 hotkey_str,
                 volume_str,
