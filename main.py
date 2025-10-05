@@ -35,6 +35,11 @@ class AudioManagerGUI:
         self.root.title("Audio Manager - Gestione Tracce Teatrali")
         self.root.geometry("1200x800")
         
+        # Percorsi file di configurazione
+        self.config_dir = Path.home() / ".audio_manager"
+        self.config_dir.mkdir(exist_ok=True)
+        self.last_session_file = self.config_dir / "last_session.json"
+        
         # Managers
         self.audio_manager = DualAudioManager()
         self.playlist_manager = PlaylistManager()
@@ -56,6 +61,9 @@ class AudioManagerGUI:
         self._setup_ui()
         self._setup_keyboard_shortcuts()
         self._load_audio_devices()
+        
+        # Carica ultima sessione se disponibile
+        self._load_last_session()
         
         # Avvia backup automatico
         self._start_auto_backup()
@@ -151,6 +159,7 @@ class AudioManagerGUI:
         ttk.Button(toolbar, text="🎨 Colore", command=self._edit_track_color).pack(side=tk.LEFT, padx=2)
         ttk.Button(toolbar, text="🔊 Volume", command=self._edit_track_volume).pack(side=tk.LEFT, padx=2)
         ttk.Button(toolbar, text="⌨️ Hotkey", command=self._edit_track_hotkey).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar, text="🎹 Auto F1-F12", command=self._auto_assign_hotkeys).pack(side=tk.LEFT, padx=2)
         
         # Lista tracce
         list_frame = ttk.Frame(playlist_frame)
@@ -161,20 +170,22 @@ class AudioManagerGUI:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
         # Treeview per le tracce
-        self.track_tree = ttk.Treeview(list_frame, columns=('index', 'title', 'duration', 'loop', 'hotkey', 'notes'),
+        self.track_tree = ttk.Treeview(list_frame, columns=('index', 'title', 'duration', 'loop', 'hotkey', 'volume', 'notes'),
                                         show='headings', yscrollcommand=scrollbar.set)
         self.track_tree.heading('index', text='#')
         self.track_tree.heading('title', text='Titolo')
         self.track_tree.heading('duration', text='Durata')
         self.track_tree.heading('loop', text='Loop')
         self.track_tree.heading('hotkey', text='Key')
+        self.track_tree.heading('volume', text='Vol%')
         self.track_tree.heading('notes', text='Note')
         
         self.track_tree.column('index', width=40, anchor=tk.CENTER)
-        self.track_tree.column('title', width=300)
+        self.track_tree.column('title', width=250)
         self.track_tree.column('duration', width=80, anchor=tk.CENTER)
         self.track_tree.column('loop', width=50, anchor=tk.CENTER)
         self.track_tree.column('hotkey', width=50, anchor=tk.CENTER)
+        self.track_tree.column('volume', width=50, anchor=tk.CENTER)
         self.track_tree.column('notes', width=150)
         
         self.track_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -592,6 +603,26 @@ class AudioManagerGUI:
                     self._set_status(f"Hotkey '{hotkey}' assegnata a: {track.title}")
                 else:
                     messagebox.showerror("Errore", "Hotkey non valida. Usa 1-9 o F1-F12")
+    
+    def _auto_assign_hotkeys(self):
+        """Assegna automaticamente F1-F12 alle prime 12 tracce"""
+        tracks = self.playlist_manager.tracks
+        if not tracks:
+            messagebox.showinfo("Info", "Nessuna traccia nella playlist")
+            return
+        
+        # Chiedi conferma
+        num_tracks = min(len(tracks), 12)
+        if messagebox.askyesno("Auto-assegnazione Hotkeys", 
+                               f"Assegnare F1-F{num_tracks} alle prime {num_tracks} tracce?\n"
+                               f"Le hotkeys esistenti verranno sovrascritte."):
+            for i in range(num_tracks):
+                hotkey = f"F{i+1}"
+                self.playlist_manager.update_track_hotkey(i, hotkey)
+            
+            self._rebuild_hotkey_map()
+            self._update_track_list()
+            self._set_status(f"Hotkeys F1-F{num_tracks} assegnate automaticamente")
                     
     def _rebuild_hotkey_map(self):
         """Ricostruisce la mappa degli hotkey"""
@@ -611,6 +642,7 @@ class AudioManagerGUI:
             duration_str = self._format_time(track.duration) if track.duration > 0 else "--:--"
             loop_str = "🔁" if track.loop else ""
             hotkey_str = track.hotkey or ""
+            volume_str = f"{track.volume}%"
             notes_str = track.notes[:30] + "..." if len(track.notes) > 30 else track.notes
             
             iid = self.track_tree.insert('', tk.END, values=(
@@ -619,6 +651,7 @@ class AudioManagerGUI:
                 duration_str,
                 loop_str,
                 hotkey_str,
+                volume_str,
                 notes_str
             ))
             
@@ -866,9 +899,82 @@ class AudioManagerGUI:
         """Imposta il messaggio di stato"""
         backup_msg = " | Backup automatico attivo ogni 5 minuti"
         self.status_label.config(text=message + backup_msg)
+    
+    def _save_last_session(self):
+        """Salva la configurazione della sessione corrente"""
+        try:
+            config = {
+                'playlist': self.playlist_manager.to_dict()['tracks'],
+                'main_device_index': self.main_device_combo.current() if hasattr(self, 'main_device_combo') else 0,
+                'preview_device_index': self.preview_device_combo.current() if hasattr(self, 'preview_device_combo') else 0,
+                'main_volume': self.main_volume_var.get() if hasattr(self, 'main_volume_var') else 100,
+                'preview_volume': self.preview_volume_var.get() if hasattr(self, 'preview_volume_var') else 100,
+                'current_track_index': self.playlist_manager.current_index if self.playlist_manager.current_index >= 0 else None
+            }
+            
+            with open(self.last_session_file, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=2, ensure_ascii=False)
+            
+            return True
+        except Exception as e:
+            print(f"Errore nel salvataggio della sessione: {e}")
+            return False
+    
+    def _load_last_session(self):
+        """Carica la configurazione dell'ultima sessione"""
+        if not self.last_session_file.exists():
+            return False
+        
+        try:
+            with open(self.last_session_file, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+            
+            # Ripristina playlist
+            if 'playlist' in config and config['playlist']:
+                self.playlist_manager.from_dict({'tracks': config['playlist']})
+                self._update_track_list()
+                self._rebuild_hotkey_map()
+            
+            # Ripristina dispositivi audio (se disponibili)
+            if hasattr(self, 'main_device_combo') and 'main_device_index' in config:
+                try:
+                    self.main_device_combo.current(config['main_device_index'])
+                    self._on_main_device_changed()
+                except:
+                    pass
+            
+            if hasattr(self, 'preview_device_combo') and 'preview_device_index' in config:
+                try:
+                    self.preview_device_combo.current(config['preview_device_index'])
+                    self._on_preview_device_changed()
+                except:
+                    pass
+            
+            # Ripristina volumi
+            if hasattr(self, 'main_volume_var') and 'main_volume' in config:
+                self.main_volume_var.set(config['main_volume'])
+                self._on_main_volume_changed()
+            
+            if hasattr(self, 'preview_volume_var') and 'preview_volume' in config:
+                self.preview_volume_var.set(config['preview_volume'])
+                self._on_preview_volume_changed()
+            
+            # Ripristina traccia corrente (senza caricarla)
+            if 'current_track_index' in config and config['current_track_index'] is not None:
+                self.playlist_manager.current_index = config['current_track_index']
+            
+            self._set_status("Ultima sessione ripristinata")
+            return True
+            
+        except Exception as e:
+            print(f"Errore nel caricamento della sessione: {e}")
+            return False
         
     def _on_closing(self):
         """Gestisce la chiusura dell'applicazione"""
+        # Salva la sessione corrente
+        self._save_last_session()
+        
         # Crea backup finale
         self.auto_backup.create_backup()
         
