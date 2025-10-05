@@ -657,9 +657,9 @@ class AudioManagerGUI:
             self.audio_manager.set_loop(track.loop)
             
             # Applica il volume della traccia al canale principale
+            self.main_volume_var.set(track.volume)
             self.audio_manager.set_main_volume(track.volume / 100.0)
-            # Aggiorna anche lo slider visivamente
-            self.main_volume.set(track.volume)
+            self.main_volume_label.config(text=f"{track.volume}%")
             
             self.current_track_label.config(text=f"🎵 {track.title}")
             self.duration_label.config(text=self._format_time(duration))
