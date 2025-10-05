@@ -62,7 +62,7 @@ class AudioManagerGUI:
         self._setup_keyboard_shortcuts()
         self._load_audio_devices()
         
-        # Carica ultima sessione se disponibile
+        # Carica ultima sessione se disponibile (DOPO aver caricato i dispositivi)
         self._load_last_session()
         
         # Avvia backup automatico
@@ -353,11 +353,16 @@ class AudioManagerGUI:
         self.main_device_combo['values'] = device_names
         self.preview_device_combo['values'] = device_names
         
+        # Imposta dispositivi di default solo se non già impostati
         if device_names:
-            self.main_device_combo.current(0)
-            self.preview_device_combo.current(min(1, len(device_names) - 1))
-            self._on_main_device_changed()
-            self._on_preview_device_changed()
+            # Controlla se è già stato impostato un dispositivo
+            if self.main_device_combo.current() < 0:
+                self.main_device_combo.current(0)
+                self._on_main_device_changed()
+            
+            if self.preview_device_combo.current() < 0:
+                self.preview_device_combo.current(min(1, len(device_names) - 1))
+                self._on_preview_device_changed()
             
     def _on_main_device_changed(self, event=None):
         """Callback cambio dispositivo main"""
@@ -911,11 +916,13 @@ class AudioManagerGUI:
                 idx = self.main_device_combo.current()
                 if idx >= 0 and idx < len(self.audio_devices):
                     main_device_id = self.audio_devices[idx]['id']
+                    print(f"Salvataggio main device: {self.audio_devices[idx]['name']} (ID: {main_device_id})")
             
             if hasattr(self, 'preview_device_combo') and hasattr(self, 'audio_devices'):
                 idx = self.preview_device_combo.current()
                 if idx >= 0 and idx < len(self.audio_devices):
                     preview_device_id = self.audio_devices[idx]['id']
+                    print(f"Salvataggio preview device: {self.audio_devices[idx]['name']} (ID: {preview_device_id})")
             
             config = {
                 'playlist': self.playlist_manager.to_dict()['tracks'],
@@ -953,25 +960,33 @@ class AudioManagerGUI:
             if hasattr(self, 'audio_devices'):
                 # Ripristina main device
                 if 'main_device_id' in config and config['main_device_id'] is not None:
+                    print(f"Cercando main device ID: {config['main_device_id']}")
                     for idx, device in enumerate(self.audio_devices):
                         if device['id'] == config['main_device_id']:
                             try:
                                 self.main_device_combo.current(idx)
                                 self._on_main_device_changed()
-                            except:
-                                pass
+                                print(f"✓ Main device ripristinato: {device['name']}")
+                            except Exception as e:
+                                print(f"Errore ripristino main device: {e}")
                             break
+                    else:
+                        print(f"⚠ Main device ID {config['main_device_id']} non trovato")
                 
                 # Ripristina preview device
                 if 'preview_device_id' in config and config['preview_device_id'] is not None:
+                    print(f"Cercando preview device ID: {config['preview_device_id']}")
                     for idx, device in enumerate(self.audio_devices):
                         if device['id'] == config['preview_device_id']:
                             try:
                                 self.preview_device_combo.current(idx)
                                 self._on_preview_device_changed()
-                            except:
-                                pass
+                                print(f"✓ Preview device ripristinato: {device['name']}")
+                            except Exception as e:
+                                print(f"Errore ripristino preview device: {e}")
                             break
+                    else:
+                        print(f"⚠ Preview device ID {config['preview_device_id']} non trovato")
             
             # Ripristina volumi
             if hasattr(self, 'main_volume_var') and 'main_volume' in config:
