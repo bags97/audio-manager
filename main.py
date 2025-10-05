@@ -370,6 +370,9 @@ class AudioManagerGUI:
         self.waveform_ax.spines['left'].set_color(self.colors['border'])
         self.waveform_ax.spines['right'].set_color(self.colors['border'])
         
+        # Linea di posizione (inizialmente nascosta)
+        self.waveform_position_line = None
+        
         self.waveform_canvas = FigureCanvasTkAgg(self.waveform_figure, self.waveform_frame)
         self.waveform_canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
         
@@ -418,6 +421,29 @@ class AudioManagerGUI:
                                   color=self.colors['fg_dim'])
         
         self.waveform_canvas.draw()
+    
+    def _update_waveform_position(self, position_seconds: float):
+        """Aggiorna la linea di posizione sul waveform"""
+        if not MATPLOTLIB_AVAILABLE or not self.waveform_ax:
+            return
+        
+        # Rimuovi la vecchia linea se esiste
+        if self.waveform_position_line is not None:
+            self.waveform_position_line.remove()
+            self.waveform_position_line = None
+        
+        # Disegna la nuova linea verticale rossa
+        self.waveform_position_line = self.waveform_ax.axvline(
+            x=position_seconds, 
+            color='#ff0000',  # Rosso brillante
+            linewidth=2,
+            linestyle='-',
+            alpha=0.8,
+            zorder=10  # Sopra la forma d'onda
+        )
+        
+        # Aggiorna solo la linea senza ridisegnare tutto
+        self.waveform_canvas.draw_idle()
         
     def _setup_keyboard_shortcuts(self):
         """Configura le scorciatoie da tastiera"""
@@ -955,6 +981,15 @@ class AudioManagerGUI:
         self.time_label.config(text="00:00")
         self._set_status("⏹ Stop")
         
+        # Rimuovi la linea di posizione dal waveform
+        if MATPLOTLIB_AVAILABLE and self.waveform_position_line is not None:
+            try:
+                self.waveform_position_line.remove()
+                self.waveform_canvas.draw_idle()
+            except:
+                pass
+            self.waveform_position_line = None
+        
     def _toggle_play(self):
         """Toggle play/pause"""
         if self.is_playing:
@@ -1160,6 +1195,10 @@ class AudioManagerGUI:
                         progress = (position / duration) * 100
                         self.progress_var.set(progress)
                         self.time_label.config(text=self._format_time(position))
+                        
+                        # Aggiorna la linea di posizione sul waveform
+                        if MATPLOTLIB_AVAILABLE:
+                            self.root.after(0, lambda p=position: self._update_waveform_position(p))
                         
                         # Auto next track quando finisce (se non loop)
                         if not self.audio_manager.is_loop_enabled() and position >= duration - 0.1:
