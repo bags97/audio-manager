@@ -1,0 +1,126 @@
+{
+  "tracks": [
+    {
+      "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 1 - incubo iniziale.mp3",
+      "title": "traccia 1 - incubo iniziale",
+      "duration": 0.0,
+      "index": 0,
+      "notes": "",
+      "color": "",
+      "loop": false,
+      "hotkey": "F1",
+      "volume": 100
+    },
+    {
+      "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 2-Un Cadavere .mp3",
+      "title": "traccia 2-Un Cadavere ",
+      "duration": 0.0,
+      "index": 1,
+      "notes": "",
+      "color": "",
+      "loop": false,
+      "hotkey": "F2",
+      "volume": 100
+    },
+    {
+      "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 3 - Bartolomeo e il rosario.mp3",
+      "title": "traccia 3 - Bartolomeo e il rosario",
+      "duration": 0.0,
+      "index": 2,
+      "notes": "",
+      "color": "",
+      "loop": false,
+      "hotkey": "F3",
+      "volume": 100
+    },
+    {
+      "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 4- Sangue tanto sangue.mp3",
+      "title": "traccia 4- Sangue tanto sangue",
+      "duration": 0.0,
+      "index": 3,
+      "notes": "",
+      "color": "",
+      "loop": false,
+      "hotkey": "F4",
+      "volume": 100
+    },
+    {
+      "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 5 - ingresso coscienza.mp3",
+      "title": "traccia 5 - ingresso coscienza",
+      "duration": 0.0,
+      "index": 4,
+      "notes": "",
+      "color": "",
+      "loop": false,
+      "hotkey": "F5",
+      "volume": 100
+    },
+    {
+      "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 6- Danza rimorsi.mp3",
+      "title": "traccia 6- Danza rimorsi",
+      "duration": 0.0,
+      "index": 5,
+      "notes": "",
+      "color": "",
+      "loop": false,
+      "hotkey": "F6",
+      "volume": 100
+    },
+    {
+      "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 7 - lo stupro.mp3",
+      "title": "traccia 7 - lo stupro",
+      "duration": 0.0,
+      "index": 6,
+      "notes": "",
+      "color": "",
+      "loop": false,
+      "hotkey": "F7",
+      "volume": 100
+    },
+    {
+      "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 8 - capolavoro.mp3",
+      "title": "traccia 8 - capolavoro",
+      "duration": 0.0,
+      "index": 7,
+      "notes": "",
+      "color": "",
+      "loop": false,
+      "hotkey": "F8",
+      "volume": 100
+    },
+    {
+      "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 9 - Giliola e le maschere.mp3",
+      "title": "traccia 9 - Giliola e le maschere",
+      "duration": 0.0,
+      "index": 8,
+      "notes": "",
+      "color": "",
+      "loop": false,
+      "hotkey": "F9",
+      "volume": 100
+    },
+    {
+      "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 10 - suicidio.mp3",
+      "title": "traccia 10 - suicidio",
+      "duration": 0.0,
+      "index": 9,
+      "notes": "",
+      "color": "",
+      "loop": false,
+      "hotkey": "F10",
+      "volume": 100
+    },
+    {
+      "filepath": "C:/Users/CodingOps.LAPTOP-MGTHQVFF/Downloads/drive-download-20251005T002138Z-1-001/traccia 11- sul buio finale .mp3",
+      "title": "traccia 11- sul buio finale ",
+      "duration": 0.0,
+      "index": 10,
+      "notes": "",
+      "color": "",
+      "loop": false,
+      "hotkey": "F11",
+      "volume": 100
+    }
+  ],
+  "current_index": -1
+}
