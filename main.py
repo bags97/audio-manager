@@ -35,6 +35,9 @@ class AudioManagerGUI:
         self.root.title("Audio Manager - Gestione Tracce Teatrali")
         self.root.geometry("1200x800")
         
+        # Tema scuro per uso teatrale al buio
+        self._setup_dark_theme()
+        
         # Percorsi file di configurazione
         self.config_dir = Path.home() / ".audio_manager"
         self.config_dir.mkdir(exist_ok=True)
@@ -73,15 +76,101 @@ class AudioManagerGUI:
         
         # Gestione chiusura
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
+    
+    def _setup_dark_theme(self):
+        """Configura il tema scuro per uso teatrale al buio"""
+        # Colori del tema scuro
+        self.colors = {
+            'bg': '#1e1e1e',           # Sfondo principale scuro
+            'bg_light': '#2d2d2d',     # Sfondo secondario
+            'bg_widget': '#252526',    # Sfondo widget
+            'fg': '#d4d4d4',           # Testo principale
+            'fg_dim': '#808080',       # Testo secondario
+            'select_bg': '#094771',    # Selezione
+            'select_fg': '#ffffff',    # Testo selezionato
+            'button_bg': '#0e639c',    # Pulsanti
+            'button_fg': '#ffffff',    # Testo pulsanti
+            'border': '#3e3e3e',       # Bordi
+            'accent': '#007acc',       # Colore accento
+            'success': '#4ec9b0',      # Verde successo
+            'warning': '#dcdcaa',      # Giallo avviso
+            'error': '#f48771'         # Rosso errore
+        }
+        
+        # Configura lo sfondo della finestra principale
+        self.root.configure(bg=self.colors['bg'])
+        
+        # Configura lo stile ttk per il tema scuro
+        style = ttk.Style()
+        style.theme_use('clam')  # Base theme
+        
+        # Frame
+        style.configure('TFrame', background=self.colors['bg'])
+        style.configure('TLabelframe', background=self.colors['bg'], 
+                       foreground=self.colors['fg'], bordercolor=self.colors['border'])
+        style.configure('TLabelframe.Label', background=self.colors['bg'], 
+                       foreground=self.colors['fg'])
+        
+        # Label
+        style.configure('TLabel', background=self.colors['bg'], 
+                       foreground=self.colors['fg'])
+        
+        # Button
+        style.configure('TButton', background=self.colors['button_bg'], 
+                       foreground=self.colors['button_fg'], bordercolor=self.colors['border'],
+                       focuscolor=self.colors['accent'])
+        style.map('TButton', background=[('active', self.colors['accent'])])
+        
+        # Combobox
+        style.configure('TCombobox', fieldbackground=self.colors['bg_widget'], 
+                       background=self.colors['bg_widget'], foreground=self.colors['fg'],
+                       arrowcolor=self.colors['fg'], bordercolor=self.colors['border'])
+        style.map('TCombobox', fieldbackground=[('readonly', self.colors['bg_widget'])],
+                 selectbackground=[('readonly', self.colors['select_bg'])],
+                 selectforeground=[('readonly', self.colors['select_fg'])])
+        
+        # Scale (sliders)
+        style.configure('TScale', background=self.colors['bg'], 
+                       troughcolor=self.colors['bg_widget'], bordercolor=self.colors['border'])
+        
+        # Treeview (tabella tracce)
+        style.configure('Treeview', background=self.colors['bg_widget'], 
+                       foreground=self.colors['fg'], fieldbackground=self.colors['bg_widget'],
+                       bordercolor=self.colors['border'])
+        style.configure('Treeview.Heading', background=self.colors['bg_light'], 
+                       foreground=self.colors['fg'], bordercolor=self.colors['border'])
+        style.map('Treeview', background=[('selected', self.colors['select_bg'])],
+                 foreground=[('selected', self.colors['select_fg'])])
+        
+        # PanedWindow
+        style.configure('TPanedwindow', background=self.colors['bg'])
+        style.configure('Sash', sashthickness=5, background=self.colors['border'])
+        
+        # Separator
+        style.configure('TSeparator', background=self.colors['border'])
+        
+        # Checkbutton
+        style.configure('TCheckbutton', background=self.colors['bg'], 
+                       foreground=self.colors['fg'])
+        style.map('TCheckbutton', background=[('active', self.colors['bg'])])
+        
+        # Progressbar
+        style.configure('TProgressbar', background=self.colors['accent'], 
+                       troughcolor=self.colors['bg_widget'], bordercolor=self.colors['border'],
+                       lightcolor=self.colors['accent'], darkcolor=self.colors['accent'])
         
     def _setup_ui(self):
         """Configura l'interfaccia utente"""
         
         # === MENU BAR ===
-        menubar = tk.Menu(self.root)
+        menubar = tk.Menu(self.root, bg=self.colors['bg_light'], fg=self.colors['fg'],
+                         activebackground=self.colors['select_bg'], 
+                         activeforeground=self.colors['select_fg'])
         self.root.config(menu=menubar)
         
-        file_menu = tk.Menu(menubar, tearoff=0)
+        file_menu = tk.Menu(menubar, tearoff=0, bg=self.colors['bg_widget'], 
+                           fg=self.colors['fg'], activebackground=self.colors['select_bg'],
+                           activeforeground=self.colors['select_fg'])
         menubar.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="Aggiungi Tracce...", command=self._add_tracks)
         file_menu.add_command(label="Salva Playlist...", command=self._save_playlist)
@@ -265,11 +354,18 @@ class AudioManagerGUI:
         if not MATPLOTLIB_AVAILABLE:
             return
             
-        self.waveform_figure = Figure(figsize=(5, 4), dpi=80)
+        # Configura stile scuro per matplotlib
+        self.waveform_figure = Figure(figsize=(5, 4), dpi=80, facecolor=self.colors['bg'])
         self.waveform_ax = self.waveform_figure.add_subplot(111)
-        self.waveform_ax.set_title("Forma d'Onda")
-        self.waveform_ax.set_xlabel("Tempo (s)")
-        self.waveform_ax.set_ylabel("Ampiezza")
+        self.waveform_ax.set_facecolor(self.colors['bg_widget'])
+        self.waveform_ax.set_title("Forma d'Onda", color=self.colors['fg'])
+        self.waveform_ax.set_xlabel("Tempo (s)", color=self.colors['fg'])
+        self.waveform_ax.set_ylabel("Ampiezza", color=self.colors['fg'])
+        self.waveform_ax.tick_params(colors=self.colors['fg'], which='both')
+        self.waveform_ax.spines['bottom'].set_color(self.colors['border'])
+        self.waveform_ax.spines['top'].set_color(self.colors['border'])
+        self.waveform_ax.spines['left'].set_color(self.colors['border'])
+        self.waveform_ax.spines['right'].set_color(self.colors['border'])
         
         self.waveform_canvas = FigureCanvasTkAgg(self.waveform_figure, self.waveform_frame)
         self.waveform_canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
@@ -280,6 +376,14 @@ class AudioManagerGUI:
             return
             
         self.waveform_ax.clear()
+        
+        # Riapplica stile scuro dopo clear
+        self.waveform_ax.set_facecolor(self.colors['bg_widget'])
+        self.waveform_ax.tick_params(colors=self.colors['fg'], which='both')
+        self.waveform_ax.spines['bottom'].set_color(self.colors['border'])
+        self.waveform_ax.spines['top'].set_color(self.colors['border'])
+        self.waveform_ax.spines['left'].set_color(self.colors['border'])
+        self.waveform_ax.spines['right'].set_color(self.colors['border'])
         
         # Ottieni i dati audio
         if self.audio_manager.main_output.audio_data is not None:
@@ -298,16 +402,17 @@ class AudioManagerGUI:
             # Crea asse temporale
             time_axis = np.arange(len(audio_data)) / sample_rate * (len(self.audio_manager.main_output.audio_data) / len(audio_data))
             
-            # Plotta
-            self.waveform_ax.plot(time_axis, audio_data, linewidth=0.5)
-            self.waveform_ax.set_title("Forma d'Onda")
-            self.waveform_ax.set_xlabel("Tempo (s)")
-            self.waveform_ax.set_ylabel("Ampiezza")
-            self.waveform_ax.grid(True, alpha=0.3)
+            # Plotta con colore accento
+            self.waveform_ax.plot(time_axis, audio_data, linewidth=0.5, color=self.colors['accent'])
+            self.waveform_ax.set_title("Forma d'Onda", color=self.colors['fg'])
+            self.waveform_ax.set_xlabel("Tempo (s)", color=self.colors['fg'])
+            self.waveform_ax.set_ylabel("Ampiezza", color=self.colors['fg'])
+            self.waveform_ax.grid(True, alpha=0.2, color=self.colors['fg_dim'])
             
         else:
             self.waveform_ax.text(0.5, 0.5, 'Nessun audio caricato', 
-                                  ha='center', va='center', transform=self.waveform_ax.transAxes)
+                                  ha='center', va='center', transform=self.waveform_ax.transAxes,
+                                  color=self.colors['fg_dim'])
         
         self.waveform_canvas.draw()
         
