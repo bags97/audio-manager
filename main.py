@@ -325,10 +325,14 @@ class AudioManagerGUI:
         self.root.bind('<Control-Down>', lambda e: self._volume_down_preview())
         # Hotkeys numerici (1-9)
         for i in range(1, 10):
-            self.root.bind(str(i), lambda e, key=str(i): self._hotkey_pressed(key))
-        # Hotkeys F1-F12
+            self.root.bind(str(i), self._make_hotkey_callback(str(i)))
+        # Hotkeys F1-F12 (usando factory per evitare problemi con F11)
         for i in range(1, 13):
-            self.root.bind(f'<F{i}>', lambda e, key=f'F{i}': self._hotkey_pressed(key))
+            self.root.bind(f'<F{i}>', self._make_hotkey_callback(f'F{i}'))
+
+    def _make_hotkey_callback(self, key):
+        """Factory per callback hotkey, risolve problemi di late binding"""
+        return lambda e: self._hotkey_pressed(key)
             
     def _hotkey_pressed(self, key: str):
         """Gestisce la pressione di un hotkey - SEMPRE su canale principale"""
