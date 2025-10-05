@@ -166,13 +166,17 @@ class PlaylistManager:
         """Ritorna il numero di tracce"""
         return len(self.tracks)
         
-    def save_playlist(self, filepath: str) -> bool:
-        """Salva la playlist in un file JSON"""
+    def save_playlist(self, filepath: str, audio_config: dict = None) -> bool:
+        """Salva la playlist in un file JSON, opzionalmente con configurazione audio"""
         try:
             data = {
                 'tracks': [track.to_dict() for track in self.tracks],
                 'current_index': self.current_index
             }
+            
+            # Aggiungi configurazione audio se fornita
+            if audio_config:
+                data['audio_config'] = audio_config
             
             with open(filepath, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
@@ -194,10 +198,13 @@ class PlaylistManager:
             self._update_indices()
             
             self.playlist_file = filepath
-            return True
+            
+            # Restituisce anche la configurazione audio se presente
+            audio_config = data.get('audio_config', None)
+            return True, audio_config
         except Exception as e:
             print(f"Errore caricamento playlist: {e}")
-            return False
+            return False, None
             
     def _update_indices(self):
         """Aggiorna gli indici di tutte le tracce"""

@@ -812,31 +812,115 @@ class AudioManagerGUI:
         return False
         
     def _save_playlist(self):
-        """Salva la playlist"""
+        """Salva la playlist con configurazione audio"""
         filepath = filedialog.asksaveasfilename(
             defaultextension=".json",
             filetypes=[("Playlist JSON", "*.json"), ("Tutti i file", "*.*")]
         )
         
         if filepath:
-            if self.playlist_manager.save_playlist(filepath):
+            # Prepara configurazione audio
+            audio_config = self._get_audio_config()
+            
+            if self.playlist_manager.save_playlist(filepath, audio_config):
                 self._set_status(f"Playlist salvata: {Path(filepath).name}")
             else:
                 messagebox.showerror("Errore", "Impossibile salvare la playlist")
+    
+    def _get_audio_config(self):
+        """Ottiene la configurazione audio corrente"""
+        config = {}
+        
+        # Salva device ID
+        if hasattr(self, 'audio_devices'):
+            idx = self.main_device_combo.current()
+            if idx >= 0 and idx < len(self.audio_devices):
+                config['main_device_id'] = self.audio_devices[idx]['id']
+                config['main_device_name'] = self.audio_devices[idx]['name']
+            
+            idx = self.preview_device_combo.current()
+            if idx >= 0 and idx < len(self.audio_devices):
+                config['preview_device_id'] = self.audio_devices[idx]['id']
+                config['preview_device_name'] = self.audio_devices[idx]['name']
+        
+        # Salva volumi
+        if hasattr(self, 'main_volume_var'):
+            config['main_volume'] = self.main_volume_var.get()
+        if hasattr(self, 'preview_volume_var'):
+            config['preview_volume'] = self.preview_volume_var.get()
+        
+        return config
                 
     def _load_playlist(self):
-        """Carica una playlist"""
+        """Carica una playlist con configurazione audio"""
         filepath = filedialog.askopenfilename(
             filetypes=[("Playlist JSON", "*.json"), ("Tutti i file", "*.*")]
         )
         
         if filepath:
-            if self.playlist_manager.load_playlist(filepath):
+            result = self.playlist_manager.load_playlist(filepath)
+            
+            # Gestisce il nuovo formato con tupla (success, audio_config)
+            if isinstance(result, tuple):
+                success, audio_config = result
+            else:
+                # Retrocompatibilità con vecchio formato
+                success = result
+                audio_config = None
+            
+            if success:
                 self._update_track_list()
                 self._rebuild_hotkey_map()
+                
+                # Applica configurazione audio se presente
+                if audio_config:
+                    self._apply_audio_config(audio_config)
+                
                 self._set_status(f"Playlist caricata: {Path(filepath).name}")
             else:
                 messagebox.showerror("Errore", "Impossibile caricare la playlist")
+    
+    def _apply_audio_config(self, config):
+        """Applica la configurazione audio caricata"""
+        if not config or not hasattr(self, 'audio_devices'):
+            return
+        
+        # Ripristina main device
+        if 'main_device_id' in config:
+            device_id = config['main_device_id']
+            device_name = config.get('main_device_name', 'sconosciuto')
+            
+            for idx, device in enumerate(self.audio_devices):
+                if device['id'] == device_id:
+                    self.main_device_combo.current(idx)
+                    self._on_main_device_changed()
+                    print(f"✓ Main device ripristinato: {device['name']}")
+                    break
+            else:
+                print(f"⚠ Main device '{device_name}' (ID: {device_id}) non trovato")
+        
+        # Ripristina preview device
+        if 'preview_device_id' in config:
+            device_id = config['preview_device_id']
+            device_name = config.get('preview_device_name', 'sconosciuto')
+            
+            for idx, device in enumerate(self.audio_devices):
+                if device['id'] == device_id:
+                    self.preview_device_combo.current(idx)
+                    self._on_preview_device_changed()
+                    print(f"✓ Preview device ripristinato: {device['name']}")
+                    break
+            else:
+                print(f"⚠ Preview device '{device_name}' (ID: {device_id}) non trovato")
+        
+        # Ripristina volumi
+        if 'main_volume' in config and hasattr(self, 'main_volume_var'):
+            self.main_volume_var.set(config['main_volume'])
+            self._on_main_volume_changed()
+        
+        if 'preview_volume' in config and hasattr(self, 'preview_volume_var'):
+            self.preview_volume_var.set(config['preview_volume'])
+            self._on_preview_volume_changed()
                 
     def _restore_backup(self):
         """Ripristina dall'ultimo backup"""
@@ -936,19 +1020,29 @@ class AudioManagerGUI:
             with open(self.last_session_file, 'w', encoding='utf-8') as f:
                 json.dump(config, f, indent=2, ensure_ascii=False)
             
+            print(f"File salvato in: {self.last_session_file}")
+            print(f"Config salvata: main_device_id={main_device_id}, preview_device_id={preview_device_id}")
+            
             return True
         except Exception as e:
             print(f"Errore nel salvataggio della sessione: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def _load_last_session(self):
         """Carica la configurazione dell'ultima sessione"""
         if not self.last_session_file.exists():
+            print(f"Nessuna sessione precedente trovata in: {self.last_session_file}")
             return False
+        
+        print(f"Caricamento sessione da: {self.last_session_file}")
         
         try:
             with open(self.last_session_file, 'r', encoding='utf-8') as f:
                 config = json.load(f)
+            
+            print(f"Config caricata: main_device_id={config.get('main_device_id')}, preview_device_id={config.get('preview_device_id')}")
             
             # Ripristina playlist
             if 'playlist' in config and config['playlist']:
