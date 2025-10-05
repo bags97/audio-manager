@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "last_main_device": null,
+  "last_preview_device": null,
+  "last_playlist": null,
+  "auto_load_last_playlist": false,
+  "audio_settings": {
+    "buffer_size": 1024,
+    "sample_rate": 44100
+  },
+  "ui_settings": {
+    "window_width": 1000,
+    "window_height": 700,
+    "theme": "default"
+  }
+}
