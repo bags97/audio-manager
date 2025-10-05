@@ -26,6 +26,8 @@ class AudioOutput:
         self.sample_rate = 44100
         self.volume = 1.0  # Volume 0.0 - 1.0 (0% - 100%)
         self.loop_enabled = False  # Loop mode
+        self.start_position = 0  # Posizione di inizio (samples) per trim
+        self.end_position = 0  # Posizione di fine (samples) per trim (0 = fine naturale)
         self.lock = threading.Lock()
         
     def load_audio(self, audio_data: np.ndarray, sample_rate: int):
@@ -51,6 +53,26 @@ class AudioOutput:
         """Imposta la modalità loop"""
         with self.lock:
             self.loop_enabled = loop
+    
+    def set_trim(self, start_seconds: float, end_seconds: float):
+        """Imposta i punti di inizio e fine per il trim"""
+        with self.lock:
+            if self.audio_data is None:
+                return
+            
+            # Converte secondi in sample
+            self.start_position = int(start_seconds * self.sample_rate)
+            if end_seconds > 0:
+                self.end_position = int(end_seconds * self.sample_rate)
+            else:
+                self.end_position = 0  # 0 = fino alla fine
+            
+            # Assicura che start_position sia nella traccia
+            if self.start_position >= len(self.audio_data):
+                self.start_position = 0
+            
+            # Posiziona all'inizio del trim
+            self.current_position = self.start_position
             
     def play(self):
         """Avvia la riproduzione"""
@@ -97,13 +119,17 @@ class AudioOutput:
                 if self.audio_data is None:
                     outdata.fill(0)
                     return
-                    
-                remaining = len(self.audio_data) - self.current_position
+                
+                # Determina la posizione di fine effettiva
+                actual_end = self.end_position if self.end_position > 0 else len(self.audio_data)
+                
+                # Controlla se abbiamo raggiunto la fine del trim
+                remaining = actual_end - self.current_position
                 if remaining <= 0:
                     # Gestione loop
                     if self.loop_enabled:
-                        self.current_position = 0
-                        remaining = len(self.audio_data)
+                        self.current_position = self.start_position
+                        remaining = actual_end - self.start_position
                     else:
                         outdata.fill(0)
                         self.is_playing = False
@@ -190,6 +216,11 @@ class DualAudioManager:
     def is_loop_enabled(self) -> bool:
         """Verifica se il loop è abilitato"""
         return self.loop_enabled
+    
+    def set_trim(self, start_seconds: float, end_seconds: float):
+        """Imposta i punti di inizio e fine per il trim su entrambi i canali"""
+        self.main_output.set_trim(start_seconds, end_seconds)
+        self.preview_output.set_trim(start_seconds, end_seconds)
         
     def load_audio_file(self, filepath: str):
         """Carica un file audio (supporta WAV, MP3 con scipy)"""

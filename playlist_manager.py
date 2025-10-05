@@ -22,6 +22,8 @@ class AudioTrack:
     loop: bool = False  # Se true, la traccia si ripete in loop
     hotkey: str = ""  # Tasto rapido (1-9, F1-F12, etc)
     volume: int = 100  # Volume personalizzato per questa traccia (0-100)
+    start_time: float = 0.0  # Tempo di inizio in secondi (per trim)
+    end_time: float = 0.0  # Tempo di fine in secondi (0 = fine naturale del file)
     
     def to_dict(self):
         return asdict(self)
@@ -246,6 +248,14 @@ class PlaylistManager:
         track = self.get_track(index)
         if track:
             track.volume = max(0, min(100, volume))
+    
+    def update_track_trim(self, index: int, start_time: float, end_time: float):
+        """Aggiorna i tempi di inizio e fine di una traccia"""
+        track = self.get_track(index)
+        if track:
+            track.start_time = max(0.0, start_time)
+            track.end_time = max(0.0, end_time)
+            # Se end_time è 0, significa nessun trim finale
             
     def get_track_by_hotkey(self, hotkey: str) -> Optional[AudioTrack]:
         """Trova una traccia per hotkey"""

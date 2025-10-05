@@ -247,6 +247,7 @@ class AudioManagerGUI:
         ttk.Button(toolbar, text="📝 Note", command=self._edit_track_notes).pack(side=tk.LEFT, padx=2)
         ttk.Button(toolbar, text="🎨 Colore", command=self._edit_track_color).pack(side=tk.LEFT, padx=2)
         ttk.Button(toolbar, text="🔊 Volume", command=self._edit_track_volume).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar, text="✂️ Taglia", command=self._edit_track_trim).pack(side=tk.LEFT, padx=2)
         ttk.Button(toolbar, text="⌨️ Hotkey", command=self._edit_track_hotkey).pack(side=tk.LEFT, padx=2)
         ttk.Button(toolbar, text="🎹 Auto F1-F12", command=self._auto_assign_hotkeys).pack(side=tk.LEFT, padx=2)
         
@@ -690,6 +691,81 @@ class AudioManagerGUI:
                 self.playlist_manager.update_track_volume(index, volume)
                 self._update_track_list()
                 self._set_status(f"Volume impostato a {volume}% per: {track.title}")
+    
+    def _edit_track_trim(self):
+        """Modifica i punti di inizio e fine della traccia selezionata"""
+        selection = self.track_tree.selection()
+        if not selection:
+            messagebox.showinfo("Info", "Seleziona una traccia")
+            return
+            
+        item = self.track_tree.item(selection[0])
+        index = int(item['values'][0]) - 1
+        track = self.playlist_manager.get_track(index)
+        
+        if track:
+            # Crea finestra di dialogo personalizzata
+            dialog = tk.Toplevel(self.root)
+            dialog.title(f"Taglia Traccia: {track.title}")
+            dialog.geometry("400x200")
+            dialog.configure(bg=self.colors['bg'])
+            dialog.transient(self.root)
+            dialog.grab_set()
+            
+            # Frame principale
+            main_frame = ttk.Frame(dialog, padding=20)
+            main_frame.pack(fill=tk.BOTH, expand=True)
+            
+            # Durata totale
+            duration_text = self._format_time(track.duration) if track.duration > 0 else "non caricata"
+            ttk.Label(main_frame, text=f"Durata totale: {duration_text}").pack(pady=(0, 10))
+            
+            # Punto di inizio
+            start_frame = ttk.Frame(main_frame)
+            start_frame.pack(fill=tk.X, pady=5)
+            ttk.Label(start_frame, text="Inizio (secondi):").pack(side=tk.LEFT, padx=(0, 10))
+            start_var = tk.DoubleVar(value=track.start_time)
+            start_spin = ttk.Spinbox(start_frame, from_=0, to=track.duration if track.duration > 0 else 9999,
+                                    textvariable=start_var, width=10, increment=0.1)
+            start_spin.pack(side=tk.LEFT)
+            ttk.Label(start_frame, text=f"({self._format_time(track.start_time)})").pack(side=tk.LEFT, padx=(5, 0))
+            
+            # Punto di fine
+            end_frame = ttk.Frame(main_frame)
+            end_frame.pack(fill=tk.X, pady=5)
+            ttk.Label(end_frame, text="Fine (secondi):").pack(side=tk.LEFT, padx=(0, 10))
+            end_var = tk.DoubleVar(value=track.end_time if track.end_time > 0 else track.duration)
+            end_spin = ttk.Spinbox(end_frame, from_=0, to=track.duration if track.duration > 0 else 9999,
+                                  textvariable=end_var, width=10, increment=0.1)
+            end_spin.pack(side=tk.LEFT)
+            end_label = ttk.Label(end_frame, text=f"({self._format_time(track.end_time if track.end_time > 0 else track.duration)})")
+            end_label.pack(side=tk.LEFT, padx=(5, 0))
+            
+            ttk.Label(main_frame, text="(0 per fine = fino alla fine naturale)", 
+                     foreground=self.colors['fg_dim']).pack(pady=(5, 10))
+            
+            # Pulsanti
+            def save_trim():
+                start = start_var.get()
+                end = end_var.get()
+                
+                # Validazione
+                if start < 0:
+                    messagebox.showerror("Errore", "Il punto di inizio deve essere >= 0")
+                    return
+                if end > 0 and end <= start:
+                    messagebox.showerror("Errore", "Il punto di fine deve essere maggiore dell'inizio")
+                    return
+                
+                self.playlist_manager.update_track_trim(index, start, end)
+                self._update_track_list()
+                self._set_status(f"Trim impostato per: {track.title}")
+                dialog.destroy()
+            
+            button_frame = ttk.Frame(main_frame)
+            button_frame.pack(pady=(10, 0))
+            ttk.Button(button_frame, text="Salva", command=save_trim).pack(side=tk.LEFT, padx=5)
+            ttk.Button(button_frame, text="Annulla", command=dialog.destroy).pack(side=tk.LEFT, padx=5)
                 
     def _edit_track_hotkey(self):
         """Modifica l'hotkey della traccia selezionata"""
@@ -802,6 +878,9 @@ class AudioManagerGUI:
             # Aggiorna loop
             self.loop_var.set(track.loop)
             self.audio_manager.set_loop(track.loop)
+            
+            # Applica trim se impostato
+            self.audio_manager.set_trim(track.start_time, track.end_time)
             
             # Applica il volume della traccia al canale principale
             self.main_volume_var.set(track.volume)
@@ -1080,12 +1159,9 @@ class AudioManagerGUI:
         self.update_thread.start()
         
     def _handle_track_end(self):
-        """Gestisce la fine della traccia"""
-        if self.playlist_manager.has_next():
-            self._next_track()
-        else:
-            self._stop()
-            self._set_status("Fine playlist")
+        """Gestisce la fine della traccia - si ferma invece di avanzare automaticamente"""
+        self._stop()
+        self._set_status("Traccia terminata")
             
     def _format_time(self, seconds: float) -> str:
         """Formatta i secondi in MM:SS"""
